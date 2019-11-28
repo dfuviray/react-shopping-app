@@ -4,6 +4,7 @@ class Form extends Component {
   render() {
     return (
       <form>
+        <h1>{this.props.title}</h1>
         <div className="row">
           <div className="col-sm-12 col-md-3 col-lg-3 mb-2">
             <input
