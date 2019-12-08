@@ -5,11 +5,52 @@ import Table from "./components/Table";
 
 class App extends Component {
   state = {
-    name: "John"
+    id: "",
+    desc: "",
+    quantity: "",
+    price: "",
+    shoppingItems: []
   };
 
-  changeName() {
-    this.setState({ name: "Smith" });
+  handleChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
+
+  isEmpty = () => {
+    return (
+      this.state.desc === "" || this.state.quantity < 1 || this.state.price < 1
+    );
+  };
+
+  clearInput() {
+    this.setState({ desc: "", quantity: "", price: "" });
+  }
+
+  handleSubmit = e => {
+    e.preventDefault();
+    const shoppingItems = [...this.state.shoppingItems];
+    const id = Date.now().toString();
+    const desc = this.state.desc;
+    const quantity = this.state.quantity;
+    const price = this.state.price;
+    shoppingItems.push({ id, desc, quantity, price });
+    this.setState({ shoppingItems });
+    this.clearInput();
+  };
+
+  handleDelete = item => {
+    const { shoppingItems } = this.state;
+    const filteredItems = shoppingItems.filter(i => i.id !== item.id);
+    this.setState({ shoppingItems: filteredItems });
+  };
+
+  getGrandTotal() {
+    const { shoppingItems } = this.state;
+    return shoppingItems
+      .map(item => item)
+      .reduce((total, item) => total + item.quantity * item.price, 0);
   }
 
   render() {
@@ -18,11 +59,20 @@ class App extends Component {
         <Navbar />
         <div style={{ maxWidth: "720px", margin: "0 auto" }}>
           <div className="container-fluid">
-            <Form title="Shopping Form" />
-            <Table />
+            <Form
+              handleChange={this.handleChange}
+              handleSubmit={this.handleSubmit}
+              isEmpty={this.isEmpty}
+              desc={this.state.desc}
+              quantity={this.state.quantity}
+              price={this.state.price}
+            />
+            <h3 className="my-3">Grand Total: {this.getGrandTotal()}</h3>
+            <Table
+              items={this.state.shoppingItems}
+              onDelete={this.handleDelete}
+            />
           </div>
-          <h1>{this.state.name}</h1>
-          <button onClick={() => this.changeName()}>Change Name</button>
         </div>
       </React.Fragment>
     );
